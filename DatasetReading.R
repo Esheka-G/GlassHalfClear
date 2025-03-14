@@ -480,7 +480,12 @@ detach(dt5)
 
 
 ## SELCTING ONLY BEAVER DAM AND FALLING CREEK-HELEN BVR and FCR
+library(tidyverse)
+SecchiDepth <- dt1 |>
+  filter(Reservoir == "BVR" | Reservoir == "FCR")
 
+SensorData <- dt2 |>
+  filter(Reservoir == "BVR" | Reservoir == "FCR")
 
 
 
