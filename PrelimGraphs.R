@@ -36,11 +36,32 @@ ggplot(SensorData, aes(x = Reservoir, y = pH, fill = Reservoir)) +
 
 ## Secchi Depth vs Time
 
+# SecchiDepth Data
 ggplot(SecchiDepth, aes(x = DateTime, y = Secchi_m)) +
   geom_line() +
   labs(title = "Secchi Depth vs Time",
        x = "Time",
        y = "Secchi in Meters")
+
+#ALICIA GRAPHS
+
+# Normalized Secchi Depth
+normSecchiDepth <- SecchiDepth %>%
+  group_by(Reservoir) %>%
+  mutate(Normalized_Secchi = (Secchi_m - min(Secchi_m, na.rm = TRUE)) /
+           (max(Secchi_m, na.rm = TRUE) - min(Secchi_m, na.rm = TRUE)))
+
+ggplot(normSecchiDepth, aes(x = DateTime, y = Normalized_Secchi)) +
+  geom_line() +
+  labs(title = "Normalized Secchi Depth Over Time",
+       x = "Date",
+       y = "Normalized Secchi Depth") +
+  theme_minimal()
+
+
+
+
+
 
 
 
