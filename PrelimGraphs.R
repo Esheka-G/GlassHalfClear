@@ -34,6 +34,14 @@ ggplot(SensorData, aes(x = Reservoir, y = pH, fill = Reservoir)) +
   theme_minimal()
 
 
+## Secchi Depth vs Time
+
+ggplot(SecchiDepth, aes(x = DateTime, y = Secchi_m)) +
+  geom_line() +
+  labs(title = "Secchi Depth vs Time",
+       x = "Time",
+       y = "Secchi in Meters")
+
 
 
 
