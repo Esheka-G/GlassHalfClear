@@ -1,3 +1,5 @@
+library(ggplot2)
+
 # Temperature Profile by Depth
 ggplot(SensorData, aes(x = Temp_C, y = Depth_m, color = Reservoir)) +
   geom_point(alpha = 0.5) +
