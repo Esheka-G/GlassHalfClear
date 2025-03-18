@@ -32,5 +32,17 @@ ggplot(SecchiDepth, aes(x = DateTime, y = Secchi_m)) +
 
 
 ## IF YOU LOOK SECCHI DEPTH HAS GONE DOWN AS TURBITY IS INCREASED SHOWING THE
-## NEGATIVE CORRELATION SHICH MAKES SENSE
+## NEGATIVE CORRELATION WHICH MAKES SENSE
+
+# Maybe filtering by site will lower amount of observations as majority of
+# Secchi Depth Data is in Site 50
+
+CTD50 <- CTD |>
+  filter(Site == 50)
+
+Secchi50 <- SecchiDepth  |>
+  filter(Site == 50)
+
+ChemistryData50 <- ChemistryData  |>
+  filter(Site == 50)
 
