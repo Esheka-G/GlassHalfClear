@@ -19,7 +19,10 @@ ggplot(NAFixChem, aes(x = DateTime, y = TP_ugL, color = Reservoir)) +
 
 ggplot(CTD, aes(x = DateTime, y = Turbidity_NTU, color = Reservoir)) +
   geom_line() +
-  labs(title = "Turbity over time")
+  labs(title = "Turbity Over Time",
+       x = "Year",
+       y = " Turbidity in NTU") +
+  theme_minimal()
 
 # Secchi Depth
 

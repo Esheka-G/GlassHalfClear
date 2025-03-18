@@ -12,5 +12,3 @@ y <- Merge$Turbidity_NTU
 correlation <- cor(x, y, use = "complete.obs")
 print(correlation)
 
-
-
