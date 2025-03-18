@@ -66,3 +66,39 @@ print(cor_spearman)
 print("Kendall Correlation:")
 print(cor_kendall)
 
+
+
+
+
+
+# Load required libraries
+library(ggplot2)
+library(gridExtra)
+
+# Function to create scatter plots with trend lines
+plot_correlation <- function(x_var, y_var, data, x_label, y_label, line_color) {
+  ggplot(data, aes_string(x = x_var, y = y_var)) +
+    geom_point(alpha = 0.5) +  # Scatter points with transparency
+    geom_smooth(method = "lm", se = TRUE, color = line_color) +  # Add trend line with confidence interval
+    labs(x = x_label, y = y_label, title = paste(y_label, "vs", x_label)) +
+    theme_minimal()
+}
+
+# Generate individual plots
+p1 <- plot_correlation("Secchi_m", "Turbidity_NTU", Merge, "Secchi Depth (m)", "Turbidity (NTU)", "red")
+p2 <- plot_correlation("Secchi_m", "Chla_ugL", Merge, "Secchi Depth (m)", "Chlorophyll-a (ug/L)", "green")
+p3 <- plot_correlation("Secchi_m", "Temp_C", Merge, "Secchi Depth (m)", "Temperature (°C)", "blue")
+p4 <- plot_correlation("Secchi_m", "DO_mgL", Merge, "Secchi Depth (m)", "Dissolved Oxygen (mg/L)", "purple")
+
+# Arrange plots in a grid layout
+grid.arrange(p1, p2, p3, p4, ncol = 2)
+
+
+
+
+
+
+
+
+
+
