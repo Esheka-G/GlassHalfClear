@@ -40,3 +40,29 @@ ggplot(Merge, aes(x = DateTime.x)) +
 
 colnames(Merge)
 
+
+
+# Load required packages
+library(ggplot2)
+library(dplyr)
+library(GGally)
+
+# Select relevant columns for correlation analysis
+cor_data <- Merge %>%
+  select(Secchi_m, Turbidity_NTU, Depth_m, Temp_C, DO_mgL, Chla_ugL)
+
+# Compute correlation matrix for Pearson, Spearman, and Kendall
+cor_pearson <- cor(cor_data, use = "complete.obs", method = "pearson")
+cor_spearman <- cor(cor_data, use = "complete.obs", method = "spearman")
+cor_kendall <- cor(cor_data, use = "complete.obs", method = "kendall")
+
+# Print correlation matrices
+print("Pearson Correlation:")
+print(cor_pearson)
+
+print("Spearman Correlation:")
+print(cor_spearman)
+
+print("Kendall Correlation:")
+print(cor_kendall)
+
