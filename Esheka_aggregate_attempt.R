@@ -70,16 +70,40 @@ print(cor_kendall)
 
 
 
+# Load necessary libraries
+library(ggplot2)
+library(dplyr)
+
+# Time-series plot of Secchi Depth
+ggplot(Merge, aes(x = DateTime.x, y = Secchi_m)) +
+  geom_line(color = "blue", linewidth = 1) +
+  geom_smooth(method = "loess", color = "red", se = FALSE) +
+  labs(title = "Secchi Depth Over Time", x = "Date", y = "Secchi Depth (m)") +
+  theme_minimal()
+
 
 # Load required libraries
-library(ggplot2)
+library(ggcorrplot)
+
+# Select numeric variables for correlation analysis
+cor_data <- Merge %>% select(Secchi_m, Turbidity_NTU, Chla_ugL, Temp_C, DO_mgL)
+
+# Compute correlation matrix
+cor_matrix <- cor(cor_data, use = "complete.obs")
+
+# Generate heatmap using the correct method argument
+ggcorrplot(cor_matrix, method = "square", lab = TRUE, outline.color = "black",
+           colors = c("blue", "white", "red"),
+        title = "Correlation Heatmap")
+
+
 library(gridExtra)
 
-# Function to create scatter plots with trend lines
+# Function to generate scatter plots with trend lines
 plot_correlation <- function(x_var, y_var, data, x_label, y_label, line_color) {
   ggplot(data, aes_string(x = x_var, y = y_var)) +
-    geom_point(alpha = 0.5) +  # Scatter points with transparency
-    geom_smooth(method = "lm", se = TRUE, color = line_color) +  # Add trend line with confidence interval
+    geom_point(alpha = 0.5) +
+    geom_smooth(method = "lm", color = line_color, se = TRUE) +
     labs(x = x_label, y = y_label, title = paste(y_label, "vs", x_label)) +
     theme_minimal()
 }
@@ -90,15 +114,45 @@ p2 <- plot_correlation("Secchi_m", "Chla_ugL", Merge, "Secchi Depth (m)", "Chlor
 p3 <- plot_correlation("Secchi_m", "Temp_C", Merge, "Secchi Depth (m)", "Temperature (°C)", "blue")
 p4 <- plot_correlation("Secchi_m", "DO_mgL", Merge, "Secchi Depth (m)", "Dissolved Oxygen (mg/L)", "purple")
 
-# Arrange plots in a grid layout
+# Arrange plots in a grid
 grid.arrange(p1, p2, p3, p4, ncol = 2)
 
 
 
+ggplot(Merge, aes(x = Reservoir, y = Secchi_m, fill = Reservoir)) +
+  geom_boxplot() +
+  labs(title = "Comparison of Secchi Depth Between Reservoirs", x = "Reservoir", y = "Secchi Depth (m)") +
+  theme_minimal()
 
 
 
+# Load necessary libraries
+library(ggplot2)
+library(dplyr)
 
+# Ensure DateTime is properly formatted in SecchiDepth dataset
+SecchiDepth$Month <- format(as.Date(SecchiDepth$DateTime), "%b")
+
+# Order months correctly from January to December
+SecchiDepth$Month <- factor(SecchiDepth$Month, levels = month.abb)
+
+# Create the boxplot for seasonal Secchi Depth variation
+ggplot(SecchiDepth, aes(x = Month, y = Secchi_m, fill = Month)) +
+  geom_boxplot() +
+  labs(title = "Seasonal Variation in Secchi Depth", x = "Month", y = "Secchi Depth (m)") +
+  theme_minimal()
+
+
+
+# Load required libraries
+library(ggplot2)
+
+# Time-series plot of Secchi Depth
+ggplot(SecchiDepth, aes(x = DateTime, y = Secchi_m)) +
+  geom_line(color = "black", linewidth = 1) +
+  geom_smooth(method = "loess", color = "red", se = FALSE) +
+  labs(title = "Secchi Depth Over Time", x = "Date", y = "Secchi Depth (m)") +
+  theme_minimal()
 
 
 

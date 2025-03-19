@@ -4,6 +4,7 @@ library(ggplot2)
 # Create the pH boxplot
 ggplot(SensorData, aes(x = Reservoir, y = pH, fill = Reservoir)) +
   geom_boxplot() +
+  guides(fill = "none") +
   labs(title = "pH Levels in BVR vs. FCR", x = "Reservoir", y = "pH")  +
   theme(
     plot.title = element_text(size = 28, face = "bold"),  # Title size
