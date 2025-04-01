@@ -103,17 +103,21 @@ plot_correlation <- function(x_var, y_var, data, title, x_label, y_label, line_c
     )
 }
 
+# Subset data for BVR and FCR reservoirs
+BVR_data <- subset(Merge, Reservoir == "BVR")
+FCR_data <- subset(Merge, Reservoir == "FCR")
+
 # Generate individual plots
-p1 <- plot_correlation("Secchi_m", "Turbidity_NTU", Merge,
-                       "Secchi Depth vs Turbidity",
+p1 <- plot_correlation("Secchi_m", "Turbidity_NTU", BVR_data,
+                       "Secchi Depth vs Turbidity (BVR)",
                        "Secchi Depth (m)", "Turbidity (NTU)", "#F8766D")  # Red-like ggplot default
 
-p2 <- plot_correlation("Secchi_m", "DO_mgL", Merge,
-                       "Secchi Depth vs DO",
-                       "Secchi Depth (m)", "Dissolved Oxygen (mg/L)", "#00BFC4")  # Blue-like ggplot default
+p2 <- plot_correlation("Secchi_m", "Turbidity_NTU", FCR_data,
+                       "Secchi Depth vs Turbidity (FCR)",
+                       "Secchi Depth (m)", "Turbidity (NTU)", "#00BFC4")  # Blue-like ggplot default
 
 # Arrange plots in a grid (Ensuring correct layout)
 combined_plot <- grid.arrange(p1, p2, ncol = 2)  # Horizontal layout
 
 # Save the arranged plots as an image
-ggsave("Correlations.png", plot = combined_plot, dpi = 300, width = 12, height = 8)
+ggsave("Secchi_vs_Turbidity_BVR_FCR.png", plot = combined_plot, dpi = 300, width = 12, height = 8)
