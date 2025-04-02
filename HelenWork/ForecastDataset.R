@@ -32,18 +32,39 @@ unique(bvreData$variable)
 # focal depths bvre = 1.5 m, fcre = 1.6 m, measured using EXO and RDO
 
 # Reshape Data
-fcre_wide <- fcreData |>
-  pivot_wider(
-    names_from = variable,
-    values_from = observation
-  )
 
-# Clean and pivot bvreData
-bvre_wide <- bvreData |>
-  drop_na(observation) |>
-  pivot_wider(
-    names_from = variable,
-    values_from = observation
-  )
+# Falling Creek only
+fcreData <- targets |>
+  filter(site_id == "fcre")
+
+# Isolating fcre variables
+fcreData_Secchi <- fcreData |>
+  filter(variable == "Secchi_m_sample")
+
+fcreData_WaterTemp <- fcreData |>
+  filter(variable == "Temp_C_mean")
+
+fcreData_ChloroA <- fcreData |>
+  filter(variable == "Chla_ugL_mean")
+
+fcreData_Bloom <- fcreData |>
+  filter(variable == "Bloom_binary_mean")
+
+# Beaverdam only
+bvreData <- targets |>
+  filter(site_id == "bvre")
+
+# Isolating bvre variables
+bvreData_Secchi <- bvreData |>
+  filter(variable == "Secchi_m_sample")
+
+bvreData_WaterTemp <- bvreData |>
+  filter(variable == "Temp_C_mean")
+
+bvreData_ChloroA <- bvreData |>
+  filter(variable == "Chla_ugL_mean")
+
+bvreData_Bloom <- bvreData |>
+  filter(variable == "Bloom_binary_mean")
 
 
