@@ -1,10 +1,10 @@
+library(tidyverse)
 url <- "https://renc.osn.xsede.org/bio230121-bucket01/vera4cast/targets/project_id=vera4cast/duration=P1D/daily-insitu-targets.csv.gz"
 
 url_inflow <- "https://renc.osn.xsede.org/bio230121-bucket01/vera4cast/targets/project_id=vera4cast/duration=P1D/daily-inflow-targets.csv.gz"
 
 site_list <- read_csv("https://raw.githubusercontent.com/LTREB-reservoirs/vera4cast/main/vera4cast_field_site_metadata.csv", show_col_types = FALSE)
 
-library(tidyverse)
 targets <- read_csv(url, show_col_types = FALSE)
 inflow_targets <- read_csv(url_inflow, show_col_types = FALSE)
 
@@ -30,5 +30,20 @@ unique(bvreData$variable)
 # These are only in bvre
 # daily mean oxygen in milligrams per liter from EXO;
 # focal depths bvre = 1.5 m, fcre = 1.6 m, measured using EXO and RDO
+
+# Reshape Data
+fcre_wide <- fcreData |>
+  pivot_wider(
+    names_from = variable,
+    values_from = observation
+  )
+
+# Clean and pivot bvreData
+bvre_wide <- bvreData |>
+  drop_na(observation) |>
+  pivot_wider(
+    names_from = variable,
+    values_from = observation
+  )
 
 
