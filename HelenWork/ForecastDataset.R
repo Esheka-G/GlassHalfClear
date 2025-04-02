@@ -43,6 +43,13 @@ fcreData_Secchi <- fcreData |>
   rename(Secchi_m = observation) |>
   select(-variable)
 
+observations_per_year <- fcreData_Secchi |>
+  mutate(year = year(datetime)) |>
+  group_by(year) |>
+  summarise(count = n())
+
+print(observations_per_year)
+
 fcreData_WaterTemp <- fcreData |>
   filter(variable == "Temp_C_mean") |>
   filter(depth_m == 1.6) |>
