@@ -24,3 +24,22 @@ remainder <- stl_fit$time.series[, "remainder"]
 
 # Plot individually
 autoplot(trend) + ggtitle("Trend Component")
+
+# Get residuals (deseasonalized data)
+residuals <- remainder
+
+# Fit ARIMA model on remainder
+arima_fit <- auto.arima(residuals)
+
+# Forecast next 35 days/weeks
+forecast_resid <- forecast(arima_fit, h = 35)
+
+# Reconstruct final forecast by adding trend + seasonality back
+seasonal_forecast <- rep(tail(seasonal, 1), 35)  # repeat last known season
+trend_forecast <- rep(tail(trend, 1), 35)        # same for trend
+
+final_forecast <- forecast_resid$mean + trend_forecast + seasonal_forecast
+
+# Plot forecast
+autoplot(final_forecast) + ggtitle("35-Day Secchi Depth Forecast (STL + ARIMA)")
+
