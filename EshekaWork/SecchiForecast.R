@@ -22,3 +22,8 @@ bvreData_Secchi <- targets |>
   filter(site_id == "bvre") |>
   filter(variable == "Secchi_m_sample")
 
+fcreData_Secchi %>%
+  filter(fcreData_Secchi[fcreData_Secchi$datetime > as.POSIXct("2020-06-08"),])
+
+plot(fcreData_Secchi$datetime, fcreData_Secchi$observation)
+

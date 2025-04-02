@@ -3,10 +3,10 @@ library(forecast)   # For STL and ARIMA
 library(tidyverse)  # For data wrangling and plotting
 
 # Example: Load your data
-secchi_data <- secchi_with_site_info
+secchi_data <- fcreData_Secchi
 
 # Preview the structure
-head(secchi_with_site_info)
+head(secchi_data)
 
 
 # Convert to time series — here we assume weekly data
