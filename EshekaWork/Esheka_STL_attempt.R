@@ -1,6 +1,7 @@
 # Core time series packages
 library(forecast)   # For STL and ARIMA
 library(tidyverse)  # For data wrangling and plotting
+library(Metrics)
 
 # Example: Load your data
 secchi_data <- fcreData_Secchi
@@ -53,3 +54,11 @@ ggplot(data = compare, aes(x = time, y = observed))+
   geom_point(color = "blue")+
   geom_line(aes(y = forecast), color = "red")+
   geom_point(aes(y = forecast), color = "red")
+
+
+stl.rmse <- rmse(compare$observed, compare$forecast)
+stl.mae <- mae(compare$observed, compare$forecast)
+
+(comparisonDF <- data.frame(model = "stl",
+                            RMSE = stl.rmse,
+                            MAE = stl.mae))
