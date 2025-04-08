@@ -1,0 +1,10 @@
+4/8 notes
+Used https://vectorbyteorg.github.io/vectorbyte-training2024/VB_TimeSeriesForecastingPractical.html#partitioning-the-data
+to make the forecast.
+
+Truncated the last 30 days of data, trained the model, and then tested the 30 day forecast. Got these accuracy values:
+  model      RMSE       MAE
+1   stl 0.6082935 0.4816213
+
+Relatively average values, but can be way better.
+Next thing to do is add regressors.
