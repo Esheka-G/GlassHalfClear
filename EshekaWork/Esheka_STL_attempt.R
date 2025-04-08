@@ -8,20 +8,28 @@ secchi_data <- fcreData_Secchi
 # Preview the structure
 head(secchi_data)
 
+n <- nrow(secchi_data)
+
+# The length of the data set minus the most recent 30 days
+trainN <- n-30
+testN <- trainN+1
+
+# Index the earlier rows for training
+train <- secchi_data[1:trainN,]
+
+# Index the later 30 for testing
+test <- secchi_data[testN:n,]
+nrow(test) # Should be 30
+
 # STL requires a UNIVARIATE time series object
-ts.secchi <- ts(secchi_data$observation, frequency = 35)
+ts.train <- ts(train$observation, frequency = 35)
 
-stl.fit <- stlm(ts.secchi, s.window = "periodic",
+stl.fit <- stlm(ts.train, s.window = "periodic",
                 method = "arima")
-
-
-##stl.fit <- stlm(ts.train, s.window = "periodic",
-##                method = "ets",
-##                etsmodel = "ANN")
 
 summary(stl.fit$model)
 hist(stl.fit$residuals)
-stl.forecasts <- forecast(stl.fit, h = 5)
+stl.forecasts <- forecast(stl.fit, h = 30)
 
 ## The forecast function gives us point forecasts, as well as prediction intervals
 stl.forecasts
@@ -35,8 +43,8 @@ plot(stl.forecasts)
 
 
 # First make a data frame with both in there
-compare <- data.frame(time = seq(1:5),
-                      observed = secchi_data$observation,
+compare <- data.frame(time = seq(1:30),
+                      observed = test$observation,
                       forecast = stl.df$`Point Forecast`)
 
 # What do you think??
