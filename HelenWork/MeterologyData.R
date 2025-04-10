@@ -7,3 +7,16 @@ meterology_AirTemp <- met_targets |>
   filter(variable == "AirTemp_C_mean") |>
   rename(AirTemp_C_mean = observation) |>
   select(-variable)
+
+
+# Join air temperature into Falling Creek combined data
+fcre_Combined <- fcre_Combined |>
+  left_join(meterology_AirTemp |>
+              select(datetime, site_id, AirTemp_C_mean),
+            by = c("datetime", "site_id"))
+
+# Join air temperature into Beaverdam combined data using FCR Data
+bvre_Combined <- bvre_Combined |>
+  left_join(meterology_AirTemp |>
+              select(datetime, AirTemp_C_mean),
+            by = "datetime")
