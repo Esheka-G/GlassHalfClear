@@ -83,4 +83,3 @@ stl.mae <- mae(compare$observed, compare$forecast)
 (comparisonDF <- data.frame(model = "stl",
                             RMSE = stl.rmse,
                             MAE = stl.mae))
-
