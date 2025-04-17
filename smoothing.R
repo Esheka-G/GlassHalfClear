@@ -7,7 +7,7 @@ smooth_daily_loess <- function(df, site_label, span = 0.2) {
   # Extract numeric variable names (excluding depth_m)
   numeric_vars <- df |>
     select(where(is.numeric)) |>
-    select(-depth_m) |>  # remove this only if it exists
+    select(-any_of("depth_m")) |>
     names()
 
   # Create full daily date grid
