@@ -33,7 +33,7 @@ nrow(test) # Should be 30
 
 # STL requires a UNIVARIATE time series object
 # ts.train <- ts(train$observation, frequency = 35)
-ts.train <- ts(train$Secchi_m, frequency = 35)
+ts.train <- ts(train$Secchi_m, frequency = 365)
 
 stl.fit <- stlm(ts.train, s.window = "periodic",
                 method = "arima")
