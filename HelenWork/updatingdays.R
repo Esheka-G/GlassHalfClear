@@ -10,7 +10,7 @@ fcre_secchi_data <- fcre_Combined |>
   arrange(datetime)
 
 # Create full daily time grid
-full_dates <- tibble(datetime = seq.Date(min(secchi_data$datetime), max(secchi_data$datetime), by = "day"))
+full_dates <- tibble(datetime = seq.Date(min(fcre_secchi_data$datetime), max(fcre_secchi_data$datetime), by = "day"))
 
 # Left join to get full daily records, then interpolate missing values
 fcre_secchi_data <- full_dates |>
@@ -28,7 +28,7 @@ bvre_secchi_data <- bvre_Combined |>
   arrange(datetime)
 
 # Create full daily time grid
-full_dates <- tibble(datetime = seq.Date(min(secchi_data$datetime), max(secchi_data$datetime), by = "day"))
+full_dates <- tibble(datetime = seq.Date(min(bvre_secchi_data$datetime), max(bvre_secchi_data$datetime), by = "day"))
 
 # Left join to get full daily records, then interpolate missing values
 bvre_secchi_data <- full_dates |>
