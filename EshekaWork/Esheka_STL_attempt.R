@@ -2,6 +2,8 @@
 library(forecast)   # For STL and ARIMA
 library(tidyverse)  # For data wrangling and plotting
 library(Metrics)
+library(dplyr)
+
 
 # Example: Load your data
 # secchi_data <- fcreData_Secchi
@@ -11,9 +13,11 @@ fcre_secchi_data %>%
   filter(year != "2013") %>%         # remove 2013
   count(year)
 
-secchi_data <- fcre_secchi_data
+# secchi_data <- fcre_smoothed
 
-
+secchi_data <- fcre_smoothed %>%
+  left_join(fcreData_WaterTemp %>% select(datetime, fcreData_WaterTemp$Temp_C_Mean),
+            by = "datetime")
 
 # Preview the structure
 head(secchi_data)
@@ -35,12 +39,18 @@ nrow(test) # Should be 30
 # ts.train <- ts(train$observation, frequency = 35)
 ts.train <- ts(train$Secchi_m, frequency = 365)
 
+# REGRESSOR PROCESSING
+xreg_all <- fcreData_WaterTemp$Temp_C_Mean
+xreg_train <- matrix(xreg_all[1:trainN], ncol = 1)
+xreg_test <- matrix(xreg_all[testN:n], ncol = 1)
+
+
 stl.fit <- stlm(ts.train, s.window = "periodic",
-                method = "arima")
+                method = "arima", xreg=xreg_train)
 
 summary(stl.fit$model)
 hist(stl.fit$residuals)
-stl.forecasts <- forecast(stl.fit, h = 30)
+stl.forecasts <- forecast(stl.fit, h = 30, newxreg = xreg_test)
 
 ## The forecast function gives us point forecasts, as well as prediction intervals
 stl.forecasts
