@@ -1,4 +1,4 @@
-smooth_daily_loess <- function(df, site_label, span = 0.2) {
+smooth_daily_loess <- function(df, site_label, span = 0.1) {
   # Make sure datetime is Date and sorted
   df <- df |>
     mutate(datetime = as.Date(datetime)) |>
