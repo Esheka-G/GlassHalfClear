@@ -8,3 +8,5 @@ Truncated the last 30 days of data, trained the model, and then tested the 30 da
 
 Relatively average values, but can be way better.
 Next thing to do is add regressors.
+
+Another thing to check is the dates

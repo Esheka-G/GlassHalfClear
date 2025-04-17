@@ -4,7 +4,16 @@ library(tidyverse)  # For data wrangling and plotting
 library(Metrics)
 
 # Example: Load your data
-secchi_data <- fcreData_Secchi
+# secchi_data <- fcreData_Secchi
+
+fcre_secchi_data %>%
+  mutate(year = format(as.Date(datetime), "%Y")) %>%
+  filter(year != "2013") %>%         # remove 2013
+  count(year)
+
+secchi_data <- fcre_secchi_data
+
+
 
 # Preview the structure
 head(secchi_data)
@@ -23,7 +32,8 @@ test <- secchi_data[testN:n,]
 nrow(test) # Should be 30
 
 # STL requires a UNIVARIATE time series object
-ts.train <- ts(train$observation, frequency = 35)
+# ts.train <- ts(train$observation, frequency = 35)
+ts.train <- ts(train$Secchi_m, frequency = 35)
 
 stl.fit <- stlm(ts.train, s.window = "periodic",
                 method = "arima")
@@ -45,7 +55,7 @@ plot(stl.forecasts)
 
 # First make a data frame with both in there
 compare <- data.frame(time = seq(1:30),
-                      observed = test$observation,
+                      observed = test$Secchi_m,
                       forecast = stl.df$`Point Forecast`)
 
 # What do you think??
@@ -59,6 +69,8 @@ ggplot(data = compare, aes(x = time, y = observed))+
 stl.rmse <- rmse(compare$observed, compare$forecast)
 stl.mae <- mae(compare$observed, compare$forecast)
 
+
 (comparisonDF <- data.frame(model = "stl",
                             RMSE = stl.rmse,
                             MAE = stl.mae))
+
