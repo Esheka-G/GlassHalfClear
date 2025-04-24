@@ -15,9 +15,9 @@ fcre_secchi_data %>%
 
 # secchi_data <- fcre_smoothed
 
-secchi_data <- fcre_smoothed %>%
-  left_join(fcreData_WaterTemp %>% select(datetime, fcreData_WaterTemp$Temp_C_Mean),
-            by = "datetime")
+# secchi_data <- fcre_smoothed %>%
+#   left_join(fcreData_WaterTemp %>% select(datetime, fcreData_WaterTemp$Temp_C_Mean),
+#             by = "datetime")
 
 # Preview the structure
 head(secchi_data)
@@ -76,13 +76,16 @@ ggplot(data = compare, aes(x = time, y = observed))+
   geom_point(color = "blue")+
   geom_line(aes(y = forecast), color = "red")+
   geom_point(aes(y = forecast), color = "red") +
-  labs(title = "Forecast of Secchi Depth")
+  labs(title = "Observed vs STL Forecast") +
+  theme_minimal() +
+  theme(legend.position = "bottom")
 
 
 stl.rmse <- rmse(compare$observed, compare$forecast)
 stl.mae <- mae(compare$observed, compare$forecast)
-
+crps_vals <- crps_norm(y = compare$observed, location = compare$forecast, scale = sd_est)
+crps_score <- mean(crps_vals, na.rm = TRUE)
 
 (comparisonDF <- data.frame(model = "stl",
                             RMSE = stl.rmse,
-                            MAE = stl.mae))
+                            MAE = stl.mae, CRPS = crps_score))
