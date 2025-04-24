@@ -59,3 +59,17 @@ comparison_metrics <- data.frame(
 )
 
 print(comparison_metrics)
+
+
+
+ggplot(forecast_vs_actual, aes(x = datetime)) +
+  geom_line(aes(y = Secchi_m_pred, color = "Forecast (Smoothed)"), linetype = "dashed", size = 1.2) +
+  geom_point(aes(y = Secchi_m_pred, color = "Forecast (Smoothed)")) +
+  geom_line(aes(y = Secchi_m_actual, color = "Actual (Raw)"), size = 1.2) +
+  geom_point(aes(y = Secchi_m_actual, color = "Actual (Raw)")) +
+  scale_color_manual(name = "Legend", values = c("Forecast (Smoothed)" = "red", "Actual (Raw)" = "blue")) +
+  labs(title = "Forecast (Smoothed) vs Actual Raw Secchi Observations",
+       y = "Secchi Depth (m)", x = "Date") +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+
