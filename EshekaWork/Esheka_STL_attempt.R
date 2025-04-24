@@ -70,16 +70,26 @@ compare <- data.frame(time = seq(1:30),
                       observed = test$Secchi_m,
                       forecast = stl.df$`Point Forecast`)
 
+library(tidyr)
 
-ggplot(data = compare, aes(x = time, y = observed))+
-  geom_line(color = "blue")+
-  geom_point(color = "blue")+
-  geom_line(aes(y = forecast), color = "red")+
-  geom_point(aes(y = forecast), color = "red") +
-  labs(title = "Observed vs STL Forecast") +
+compare_long <- compare |>
+  pivot_longer(cols = c(observed, forecast),
+               names_to  = "series",
+               values_to = "value")
+
+ggplot(compare_long, aes(x = time, y = value, colour = series)) +
+  geom_line() +
+  geom_point() +
+  scale_colour_manual(values = c(observed = "blue",
+                                 forecast = "red"),
+                      labels = c(observed = "Observed",
+                                 forecast = "STL Forecast"),
+                      name   = NULL) +
+  labs(title = "Observed vs STL Forecast (Falling Creek)",
+       x     = "Time (Days)",
+       y     = "Secchi Depth (m)") +
   theme_minimal() +
   theme(legend.position = "bottom")
-
 
 stl.rmse <- rmse(compare$observed, compare$forecast)
 stl.mae <- mae(compare$observed, compare$forecast)
