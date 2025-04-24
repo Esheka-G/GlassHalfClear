@@ -40,13 +40,13 @@ nrow(test) # Should be 30
 ts.train <- ts(train$Secchi_m, frequency = 365)
 
 # REGRESSOR PROCESSING
-xreg_all <- fcreData_WaterTemp$Temp_C_Mean
-xreg_train <- matrix(xreg_all[1:trainN], ncol = 1)
-xreg_test <- matrix(xreg_all[testN:n], ncol = 1)
+# xreg_all <- fcreData_WaterTemp$Temp_C_Mean
+# xreg_train <- matrix(xreg_all[1:trainN], ncol = 1)
+# xreg_test <- matrix(xreg_all[testN:n], ncol = 1)
 
 
 stl.fit <- stlm(ts.train, s.window = "periodic",
-                method = "arima", xreg=xreg_train)
+                method = "arima")
 
 summary(stl.fit$model)
 hist(stl.fit$residuals)
@@ -70,12 +70,13 @@ compare <- data.frame(time = seq(1:30),
                       observed = test$Secchi_m,
                       forecast = stl.df$`Point Forecast`)
 
-# What do you think??
+
 ggplot(data = compare, aes(x = time, y = observed))+
   geom_line(color = "blue")+
   geom_point(color = "blue")+
   geom_line(aes(y = forecast), color = "red")+
-  geom_point(aes(y = forecast), color = "red")
+  geom_point(aes(y = forecast), color = "red") +
+  labs(title = "Forecast of Secchi Depth")
 
 
 stl.rmse <- rmse(compare$observed, compare$forecast)
