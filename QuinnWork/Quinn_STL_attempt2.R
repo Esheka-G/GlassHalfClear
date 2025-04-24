@@ -3,6 +3,7 @@ library(forecast)
 library(tidyverse)
 library(Metrics)
 library(dplyr)
+library(scoringRules)  # for CRPS
 
 # Filter and join
 fcre_secchi_data %>%
@@ -15,17 +16,9 @@ secchi_data_quinn <- fcre_smoothed %>%
   left_join(fcreData_WaterTemp %>% select(datetime, Temp_C_mean), by = "datetime") %>%
   left_join(fcre_secchi_data %>% select(datetime, Chla_ugL_mean, Bloom_binary_mean, Rain_mm_sum), by = "datetime")
 
-# Create transformed variables
-secchi_data_quinn <- secchi_data_quinn %>%
-  mutate(
-    Temp_C_mean_sq = Temp_C_mean.x^2,
-    Temp_C_mean_log = log1p(Temp_C_mean.x)  # Safe log transform
-  )
-
 # Remove any rows with missing values in predictors or target
 secchi_data_quinn <- secchi_data_quinn %>%
-  drop_na(Secchi_m, Temp_C_mean.x, Temp_C_mean_sq, Temp_C_mean_log,
-          Chla_ugL_mean.x, Bloom_binary_mean.x, Rain_mm_sum.x)
+  drop_na(Secchi_m, Temp_C_mean.x, Chla_ugL_mean.x, Bloom_binary_mean.x, Rain_mm_sum.x)
 
 # Split into training and test sets
 n <- nrow(secchi_data_quinn)
@@ -43,6 +36,14 @@ run_model <- function(regressor_all, regressor_name) {
   stl.fit <- stlm(ts.train, s.window = "periodic", method = "arima", xreg = xreg_train)
   stl.forecasts <- forecast(stl.fit, h = 30, newxreg = xreg_test)
 
+  # Estimate forecast SD from 80% interval (z ≈ 1.28)
+  z_80 <- qnorm(0.9)
+  sd_est <- (stl.forecasts$upper[, 1] - stl.forecasts$lower[, 1]) / (2 * z_80)
+
+  # Compute CRPS
+  crps_vals <- crps_norm(y = test$Secchi_m, location = stl.forecasts$mean, scale = sd_est)
+  crps_score <- mean(crps_vals, na.rm = TRUE)
+
   forecast_df <- data.frame(
     time = 1:30,
     observed = test$Secchi_m,
@@ -53,23 +54,20 @@ run_model <- function(regressor_all, regressor_name) {
   list(
     df = forecast_df,
     rmse = rmse(test$Secchi_m, stl.forecasts$mean),
-    mae = mae(test$Secchi_m, stl.forecasts$mean)
+    mae = mae(test$Secchi_m, stl.forecasts$mean),
+    crps = crps_score
   )
 }
 
 # Run models for each regressor
-results_original <- run_model(secchi_data_quinn$Temp_C_mean.x, "Temp_C_mean")
-results_squared  <- run_model(secchi_data_quinn$Temp_C_mean_sq, "Temp_C_mean_sq")
-results_log      <- run_model(secchi_data_quinn$Temp_C_mean_log, "Temp_C_mean_log")
-results_chla     <- run_model(secchi_data_quinn$Chla_ugL_mean.x, "Chla_ugL_mean")
-results_bloom    <- run_model(secchi_data_quinn$Bloom_binary_mean.x, "Bloom_binary_mean")
-results_rain     <- run_model(secchi_data_quinn$Rain_mm_sum.x, "Rain_mm_sum")
+results_original <- run_model(secchi_data_quinn$Temp_C_mean.x, "Water Temperature")
+results_chla     <- run_model(secchi_data_quinn$Chla_ugL_mean.x, "Chlorophyll-a Concentration")
+results_bloom    <- run_model(secchi_data_quinn$Bloom_binary_mean.x, "Mean Binary Presence of Algal Blooms")
+results_rain     <- run_model(secchi_data_quinn$Rain_mm_sum.x, "Rainfall")
 
 # Combine forecasts into one dataframe for plotting
 forecast_comparison <- bind_rows(
   results_original$df,
-  results_squared$df,
-  results_log$df,
   results_chla$df,
   results_bloom$df,
   results_rain$df
@@ -88,14 +86,12 @@ ggplot(forecast_comparison, aes(x = time)) +
   ) +
   theme_minimal()
 
-# Table of RMSE and MAE for each model
+# Table of RMSE, MAE, CRPS for each model
 comparison_metrics <- data.frame(
-  Model = c("Temp_C_mean", "Temp_C_mean_sq", "Temp_C_mean_log",
-            "Chla_ugL_mean", "Bloom_binary_mean", "Rain_mm_sum"),
-  RMSE = c(results_original$rmse, results_squared$rmse, results_log$rmse,
-           results_chla$rmse, results_bloom$rmse, results_rain$rmse),
-  MAE = c(results_original$mae, results_squared$mae, results_log$mae,
-          results_chla$mae, results_bloom$mae, results_rain$mae)
+  Model = c("Water Temperature", "Chlorophyll-a Concentration", "Mean Binary Presence of Algal Blooms", "Rainfall"),
+  RMSE = c(results_original$rmse, results_chla$rmse, results_bloom$rmse, results_rain$rmse),
+  MAE = c(results_original$mae, results_chla$mae, results_bloom$mae, results_rain$mae),
+  CRPS = c(results_original$crps, results_chla$crps, results_bloom$crps, results_rain$crps)
 )
 
 print(comparison_metrics)
