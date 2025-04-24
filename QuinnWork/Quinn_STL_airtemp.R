@@ -45,7 +45,7 @@ run_model <- function(regressor_all, regressor_name) {
 }
 
 # Run the model using AirTemp_C_mean as the regressor
-results_original <- run_model(secchi_data$AirTemp_C_mean, "Air Temperature")
+results_original <- run_model(secchi_data$AirTemp_C_mean.x, "Air Temperature")
 
 # Combine results
 forecast_comparison <- results_original$df
