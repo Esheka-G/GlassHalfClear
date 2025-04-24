@@ -11,28 +11,28 @@ fcre_secchi_data %>%
   count(year)
 
 # Join all relevant variables into one dataset
-secchi_data <- fcre_smoothed %>%
+secchi_data_quinn <- fcre_smoothed %>%
   left_join(fcreData_WaterTemp %>% select(datetime, Temp_C_mean), by = "datetime") %>%
   left_join(fcre_secchi_data %>% select(datetime, Chla_ugL_mean, Bloom_binary_mean, Rain_mm_sum), by = "datetime")
 
 # Create transformed variables
-secchi_data <- secchi_data %>%
+secchi_data_quinn <- secchi_data_quinn %>%
   mutate(
     Temp_C_mean_sq = Temp_C_mean.x^2,
     Temp_C_mean_log = log1p(Temp_C_mean.x)  # Safe log transform
   )
 
 # Remove any rows with missing values in predictors or target
-secchi_data <- secchi_data %>%
+secchi_data_quinn <- secchi_data_quinn %>%
   drop_na(Secchi_m, Temp_C_mean.x, Temp_C_mean_sq, Temp_C_mean_log,
-          Chla_ugL_mean.x, Bloom_binary_mean.x, Rain_mm_sum)
+          Chla_ugL_mean.x, Bloom_binary_mean.x, Rain_mm_sum.x)
 
 # Split into training and test sets
-n <- nrow(secchi_data)
+n <- nrow(secchi_data_quinn)
 trainN <- n - 30
 testN <- trainN + 1
-train <- secchi_data[1:trainN, ]
-test <- secchi_data[testN:n, ]
+train <- secchi_data_quinn[1:trainN, ]
+test <- secchi_data_quinn[testN:n, ]
 ts.train <- ts(train$Secchi_m, frequency = 365)
 
 # Function to run model using one regressor
@@ -58,12 +58,12 @@ run_model <- function(regressor_all, regressor_name) {
 }
 
 # Run models for each regressor
-results_original <- run_model(secchi_data$Temp_C_mean.x, "Temp_C_mean")
-results_squared  <- run_model(secchi_data$Temp_C_mean_sq, "Temp_C_mean_sq")
-results_log      <- run_model(secchi_data$Temp_C_mean_log, "Temp_C_mean_log")
-results_chla     <- run_model(secchi_data$Chla_ugL_mean.x, "Chla_ugL_mean")
-results_bloom    <- run_model(secchi_data$Bloom_binary_mean.x, "Bloom_binary_mean")
-results_rain     <- run_model(secchi_data$Rain_mm_sum, "Rain_mm_sum")
+results_original <- run_model(secchi_data_quinn$Temp_C_mean.x, "Temp_C_mean")
+results_squared  <- run_model(secchi_data_quinn$Temp_C_mean_sq, "Temp_C_mean_sq")
+results_log      <- run_model(secchi_data_quinn$Temp_C_mean_log, "Temp_C_mean_log")
+results_chla     <- run_model(secchi_data_quinn$Chla_ugL_mean.x, "Chla_ugL_mean")
+results_bloom    <- run_model(secchi_data_quinn$Bloom_binary_mean.x, "Bloom_binary_mean")
+results_rain     <- run_model(secchi_data_quinn$Rain_mm_sum.x, "Rain_mm_sum")
 
 # Combine forecasts into one dataframe for plotting
 forecast_comparison <- bind_rows(

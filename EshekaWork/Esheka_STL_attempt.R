@@ -50,7 +50,9 @@ stl.fit <- stlm(ts.train, s.window = "periodic",
 
 summary(stl.fit$model)
 hist(stl.fit$residuals)
-stl.forecasts <- forecast(stl.fit, h = 30, newxreg = xreg_test)
+stl.forecasts <- forecast(stl.fit, h = 30)
+
+#stl.forecasts <- forecast(stl.fit, h = 30, newxreg = xreg_test)
 
 ## The forecast function gives us point forecasts, as well as prediction intervals
 stl.forecasts
