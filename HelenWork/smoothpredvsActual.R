@@ -73,3 +73,43 @@ ggplot(forecast_vs_actual, aes(x = datetime)) +
   theme_minimal() +
   theme(legend.position = "bottom")
 
+
+# Add CRPS
+library(scoringRules)
+
+# Estimate forecast standard deviation from 80% prediction interval (z ≈ 1.28)
+z_80 <- qnorm(0.9)  # 80% interval corresponds to ±1.28 SD
+sd_est <- (stl.forecasts$upper[, "80%"] - stl.forecasts$lower[, "80%"]) / (2 * z_80)
+
+# Build extended forecast_df to include SD
+forecast_df <- forecast_df %>%
+  mutate(
+    sd = sd_est
+  )
+
+# Join again with actuals to include sd
+forecast_vs_actual <- forecast_df %>%
+  left_join(real_secchi, by = "datetime") %>%
+  filter(!is.na(Secchi_m_actual))
+
+# Compute CRPS
+crps_vals <- crps_norm(
+  y = forecast_vs_actual$Secchi_m_actual,
+  location = forecast_vs_actual$Secchi_m_pred,
+  scale = forecast_vs_actual$sd
+)
+
+crps_score <- mean(crps_vals, na.rm = TRUE)
+
+# Update your metrics dataframe
+comparison_metrics <- data.frame(
+  Model = "STL on Smoothed vs Real Data",
+  RMSE = stl.rmse,
+  MAE = stl.mae,
+  CRPS = crps_score
+)
+
+print(comparison_metrics)
+
+
+
