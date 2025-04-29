@@ -30,6 +30,9 @@ ggplot(forecast_vs_actual, aes(x = datetime)) +
   theme(legend.position = "bottom")
 
 # Performance vs. the RAW Secchi observations
+# z_80  <- qnorm(0.9)          # ≈ 1.2816
+# sd_est <- (Hi80 - Lo80) / (2 * z_80)
+
 stl.raw_rmse <- rmse(forecast_vs_actual$Secchi_m_actual,
                  forecast_vs_actual$forecast)
 
