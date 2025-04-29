@@ -10,3 +10,9 @@ Relatively average values, but can be way better.
 Next thing to do is add regressors.
 
 Another thing to check is the dates
+
+forecast dataset
+meteorology data
+smoothing.R OR keeporiginaldata.R
+smoothpredvsactual
+updatingdata.R

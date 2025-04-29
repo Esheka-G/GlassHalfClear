@@ -86,7 +86,7 @@ ggplot(forecast_comparison, aes(x = time)) +
   geom_line(aes(y = forecast, color = model), linewidth = 1) +
   geom_point(aes(y = forecast, color = model)) +
   labs(title = "Forecast Comparison by Regressor Transformation on Water Temperature",
-       y = "Secchi Depth", x = "Time (Days)",
+       y = "Secchi Depth (m)", x = "Time (Days)",
        color = "Model") +
   theme_minimal()
 
