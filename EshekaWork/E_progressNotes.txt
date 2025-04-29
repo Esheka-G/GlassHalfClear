@@ -13,6 +13,6 @@ Another thing to check is the dates
 
 forecast dataset
 meteorology data
+updatingDays
 smoothing.R OR keeporiginaldata.R
 smoothpredvsactual
-updatingdata.R
