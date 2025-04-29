@@ -29,10 +29,7 @@ ggplot(forecast_vs_actual, aes(x = datetime)) +
   theme_minimal() +
   theme(legend.position = "bottom")
 
-## ── 1. Make sure sd_est came out of run_model() ──────────────────────────────
-## (add “sd_est = sd_est” to forecast_df inside run_model() if you haven’t yet)
-
-# ── 2. Performance vs. the RAW Secchi observations ───────────────────────────
+# Performance vs. the RAW Secchi observations
 stl.raw_rmse <- rmse(forecast_vs_actual$Secchi_m_actual,
                  forecast_vs_actual$forecast)
 
@@ -47,19 +44,3 @@ crps_score <- mean(crps_vals, na.rm = TRUE)
                             RMSE = stl.raw_rmse,
                             MAE = stl.raw_mae, CRPS = crps_score))
 print(comparisonDF)
-# # Gaussian-CRPS: use the same sd_est vector you stored in forecast_vs_actual
-# raw_crps <- mean(
-#   crps_norm(y        = forecast_vs_actual$Secchi_m_actual,
-#             location = forecast_vs_actual$forecast,
-#             scale    = forecast_vs_actual$sd_est),
-#   na.rm = TRUE
-# )
-#
-# performance_raw <- data.frame(
-#   Model = "Air Temperature",
-#   RMSE  = raw_rmse,
-#   MAE   = raw_mae,
-#   CRPS  = raw_crps
-# )
-#
-# print(performance_raw)
