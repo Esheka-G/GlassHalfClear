@@ -191,3 +191,6 @@ vera4cast_df <- forecast_comparison %>%
 write_csv(vera4cast_df, "stl_airtemp_forecast.csv")
 
 read_csv("stl_airtemp_forecast.csv") %>% head()
+
+#Check forecast format
+vera4castHelpers::forecast_output_validator("stl_airtemp_forecast.csv")
