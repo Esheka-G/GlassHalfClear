@@ -12,7 +12,7 @@ fcre_secchi_data %>%
   count(year)
 
 secchi_data <- fcre_smoothed %>%
-  left_join(meterology_AirTemp %>% select(datetime, AirTemp_C_mean),
+  left_join(meterology_AirTemp %>% select(datetime, AirTemp_C_mean, ),
             by = "datetime")
 
 n <- nrow(secchi_data)
