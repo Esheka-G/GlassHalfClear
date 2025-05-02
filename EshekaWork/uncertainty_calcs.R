@@ -112,6 +112,8 @@ forecast_vs_actual <- forecast_comparison %>%
   left_join(real_secchi, by = "datetime") %>%
   filter(!is.na(Secchi_m_actual))
 
+
+
 # Plot forecast
 
 ggplot(forecast_vs_actual, aes(x = datetime)) +
@@ -154,5 +156,5 @@ ggplot(forecast_vs_actual, aes(x = datetime)) +
   labs(title = "STL forecast with 80 % & 95 % prediction intervals",
        y = "Secchi Depth (m)", x = NULL,
        caption = "Shaded bands represent predictive uncertainty")
-
-
+# Mean, std
+sig <- forecast_vs_actual$sd
