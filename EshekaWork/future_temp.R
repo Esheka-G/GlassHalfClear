@@ -10,15 +10,18 @@ df_future <- weather |>
 
 library(lubridate)   # hour(), minute()
 
+
 airtemp_noon <- df_future %>%
-  ## 1. keep only the air‑temperature rows
-  filter(variable == "air_temperature") %>%
+  filter(variable == "air_temperature") %>%          # keep only air‑temp rows
+  filter(hour(datetime) == 12, minute(datetime) == 0) %>%   # keep 12:00:00
+  mutate(date        = as.Date(datetime),
+         air_temp_K  = prediction,        # <‑‑ value column in Kelvin
+         air_temp_C  = air_temp_K - 273.15) %>%      # convert to °C
+  select(date, air_temp_C)                           # keep what you need
 
-  ## 2. keep only the rows whose timestamp is exactly 12:00:00
-  filter(hour(datetime) == 12, minute(datetime) == 0) %>%
+# result:
+#   date       air_temp_C
+#  2025-05-01     19.57
+#  2025-05-02     21.13
+#  ...
 
-  ## 3. drop any forecast metadata you don’t need
-  mutate(date = as.Date(datetime)) %>%
-  select(date, air_temp = prediction)                # <-- change “prediction”
-#     to the actual value
-#     column in your data
