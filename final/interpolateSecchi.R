@@ -2,11 +2,11 @@ library(dplyr)
 library(zoo)
 
 interpolate_secchi <- function(df) {
-  df %>%
-    arrange(datetime) %>%
+  df |>
+    arrange(datetime) |>
     mutate(
       Secchi_m_smoothed = na.approx(Secchi_m, na.rm = FALSE, rule = 2)  # no extrapolation
-    ) %>%
+    ) |>
     relocate(Secchi_m_smoothed, .after = datetime)
 }
 

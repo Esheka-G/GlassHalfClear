@@ -12,31 +12,31 @@ get_secchi_airtemp_precip_data <- function(site = "fcre") {
   met <- read_csv(url_met, show_col_types = FALSE)
 
   # Combine and filter to site for Secchi only
-  targets <- bind_rows(insitu, inflow) %>%
+  targets <- bind_rows(insitu, inflow) |>
     filter(site_id == !!site)
 
-  secchi <- targets %>%
-    filter(variable == "Secchi_m_sample") %>%
-    rename(Secchi_m = observation) %>%
+  secchi <- targets |>
+    filter(variable == "Secchi_m_sample") |>
+    rename(Secchi_m = observation) |>
     select(datetime, Secchi_m)
 
   # Meteorology — use full datetime set (not site-specific)
-  airtemp <- met %>%
-    filter(variable == "AirTemp_C_mean") %>%
-    rename(AirTemp_C_mean = observation) %>%
+  airtemp <- met |>
+    filter(variable == "AirTemp_C_mean") |>
+    rename(AirTemp_C_mean = observation) |>
     select(datetime, AirTemp_C_mean)
 
-  precip <- met %>%
-    filter(variable == "Rain_mm_sum") %>%
-    rename(Rain_mm_sum = observation) %>%
+  precip <- met |>
+    filter(variable == "Rain_mm_sum") |>
+    rename(Rain_mm_sum = observation) |>
     select(datetime, Rain_mm_sum)
 
   # Join meteorology first (covers all days), then left join Secchi
-  combined <- airtemp %>%
-    full_join(precip, by = "datetime") %>%
-    left_join(secchi, by = "datetime") %>%
-    arrange(datetime) %>%
-    mutate(site_id = site) %>%
+  combined <- airtemp |>
+    full_join(precip, by = "datetime") |>
+    left_join(secchi, by = "datetime") |>
+    arrange(datetime) |>
+    mutate(site_id = site) |>
     relocate(site_id)
 
   return(combined)
