@@ -12,13 +12,21 @@ secchi_data <- fcre_Combined %>%
   ) %>%
   filter(!is.na(Secchi_m), !is.na(Chla_lag2), !is.na(Bloom_lag1))
 
+secchi_mod <- secchi_data
+
+
+
 # --- Step 2: Split into training and testing sets ---
-n <- nrow(secchi_data)
+n <- nrow(secchi_mod)
+
+secchi_data$Temp_C_mean[testN:n] <- airtemp_noon$air_temp_C[1:30]
+
+
 trainN <- n - 30
 testN <- trainN + 1
 
-train <- secchi_data[1:trainN, ]
-test  <- secchi_data[testN:n, ]
+train <- secchi_mod[1:trainN, ]
+test  <- secchi_mod[testN:n,]
 
 ts.train <- ts(train$Secchi_m, frequency = 7)  # Weekly seasonality for short series
 
@@ -34,9 +42,14 @@ fc <- forecast(fit, h = 30, newxreg = xreg_test)
 z_80 <- qnorm(0.9)
 sd_est <- (fc$upper[, 1] - fc$lower[, 1]) / (2 * z_80)
 
+start_forecast_date <-Sys.Date() - 1
+
+future_dates <- seq.Date(start_forecast_date, by = "day", length.out = 30)
+future_dates
+
 # --- Step 5: Plot forecast ---
 forecast_df <- tibble(
-  date = test$datetime,
+  date = future_dates,
   observed = test$Secchi_m,
   forecast = as.numeric(fc$mean),
   lower = as.numeric(fc$lower[, 1]),
@@ -45,7 +58,6 @@ forecast_df <- tibble(
 
 ggplot(forecast_df, aes(x = date)) +
   geom_ribbon(aes(ymin = lower, ymax = upper), fill = "#a6bddb", alpha = 0.4) +
-  geom_line(aes(y = observed), color = "black", size = 1.2) +
   geom_line(aes(y = forecast), color = "#0570b0", size = 1.2, linetype = "dashed") +
   geom_point(aes(y = forecast), color = "#0570b0", size = 2) +
   labs(
@@ -56,12 +68,12 @@ ggplot(forecast_df, aes(x = date)) +
   ) +
   theme_minimal(base_size = 14)
 
-# --- Step 6: Calculate performance metrics ---
-metrics <- data.frame(
-  Model = "Chla_lag2 + Bloom_lag1",
-  RMSE = rmse(test$Secchi_m, fc$mean),
-  MAE = mae(test$Secchi_m, fc$mean),
-  CRPS = mean(crps_norm(test$Secchi_m, fc$mean, sd_est), na.rm = TRUE)
-)
-
-print(metrics)
+# # --- Step 6: Calculate performance metrics ---
+# metrics <- data.frame(
+#   Model = "Chla_lag2 + Bloom_lag1",
+#   RMSE = rmse(test$Secchi_m, fc$mean),
+#   MAE = mae(test$Secchi_m, fc$mean),
+#   CRPS = mean(crps_norm(test$Secchi_m, fc$mean, sd_est), na.rm = TRUE)
+# )
+#
+# print(metrics)
