@@ -11,17 +11,16 @@ get_secchi_airtemp_precip_data <- function(site = "fcre") {
   inflow <- read_csv(url_inflow, show_col_types = FALSE)
   met <- read_csv(url_met, show_col_types = FALSE)
 
-  # Combine and properly filter to site
+  # Combine and filter to site for Secchi only
   targets <- bind_rows(insitu, inflow) %>%
     filter(site_id == !!site)
 
-  # Secchi
   secchi <- targets %>%
     filter(variable == "Secchi_m_sample") %>%
     rename(Secchi_m = observation) %>%
-    select(datetime, site_id, Secchi_m)
+    select(datetime, Secchi_m)
 
-  # Meteorology (site-agnostic)
+  # Meteorology — use full datetime set (not site-specific)
   airtemp <- met %>%
     filter(variable == "AirTemp_C_mean") %>%
     rename(AirTemp_C_mean = observation) %>%
@@ -32,13 +31,17 @@ get_secchi_airtemp_precip_data <- function(site = "fcre") {
     rename(Rain_mm_sum = observation) %>%
     select(datetime, Rain_mm_sum)
 
-  # Join
-  combined <- secchi %>%
-    left_join(airtemp, by = "datetime") %>%
-    left_join(precip, by = "datetime")
+  # Join meteorology first (covers all days), then left join Secchi
+  combined <- airtemp %>%
+    full_join(precip, by = "datetime") %>%
+    left_join(secchi, by = "datetime") %>%
+    arrange(datetime) %>%
+    mutate(site_id = site) %>%
+    relocate(site_id)
 
   return(combined)
 }
+
 
 fcre_Combined <- get_secchi_airtemp_precip_data("fcre")
 bvre_Combined <- get_secchi_airtemp_precip_data("bvre")
