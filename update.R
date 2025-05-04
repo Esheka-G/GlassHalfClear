@@ -103,6 +103,12 @@ forecast_df <- tibble(
   upper = as.numeric(fc$upper[, 1])
 )
 
+sd_est <- (forecast_df$upper - forecast_df$lower) / (2 * z_80)
+forecast_comparison <- forecast_df %>%
+  transmute(datetime = date,          # keep the time stamp
+            forecast = forecast,      # point forecast  (μ)
+            sd = sd_est)              # std‑dev estimate (σ)
+
 # ---- Step 8: Plot the forecast ----
 ggplot(forecast_df, aes(x = date)) +
   geom_ribbon(aes(ymin = lower, ymax = upper), fill = "#a6bddb", alpha = 0.4) +
@@ -114,3 +120,45 @@ ggplot(forecast_df, aes(x = date)) +
     x = "Date", y = "Secchi Depth (m)"
   ) +
   theme_minimal(base_size = 14)
+
+
+#Set metadata for VERA4cast
+project_id <- "vera4cast"
+model_id <- "stl_airtemp"
+reference_datetime <- start_forecast_date
+duration <- "P1D"
+site_id <- "fcre"
+depth_m <- NA
+family <- "normal"
+variable <- "secchi"
+
+#Build our long-format forecast for export
+vera4cast_df <- forecast_comparison %>%          # <‑‑ now defined
+  mutate(datetime = format(as.POSIXct(datetime),
+                           "%Y-%m-%d 00:00:00", tz = "UTC")) %>%
+  pivot_longer(cols = c(forecast, sd),
+               names_to = "parameter",
+               values_to = "prediction") %>%
+  mutate(parameter = recode(parameter,
+                            "forecast" = "mu",
+                            "sd"       = "sigma"),
+         project_id = project_id,
+         model_id   = model_id,
+         reference_datetime = format(Sys.time(), "%Y-%m-%d 00:00:00", tz = "UTC"),
+         duration   = duration,
+         site_id    = site_id,
+         depth_m    = depth_m,
+         family     = family,
+         variable   = variable) %>%
+  select(project_id, model_id, datetime, reference_datetime,
+         duration, site_id, depth_m, family, parameter, variable, prediction)
+
+
+# Export to CSV
+write_csv(vera4cast_df, "stl_airtemp_forecast.csv")
+
+read_csv("stl_airtemp_forecast.csv") %>% head()
+
+#Check forecast format
+vera4castHelpers::forecast_output_validator("stl_airtemp_forecast.csv")
+
