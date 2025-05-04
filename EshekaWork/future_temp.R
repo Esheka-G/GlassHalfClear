@@ -38,5 +38,7 @@ precip_noon <- df_future %>%
   select(date, precip_mm)
 
 # 2. join to the noon‑air‑temp table you already built
-airtemp_noon <- airtemp_noon %>%
+noon_future_regs <- airtemp_noon %>%
   left_join(precip_noon, by = "date")
+
+colnames(noon_future_regs) <- c("datetime", "AirTemp_C_mean", "Rain_mm_sum")
