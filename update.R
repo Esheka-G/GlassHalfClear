@@ -86,7 +86,7 @@ n <- nrow(secchi_data)
 trainN <- n - 30
 train <- secchi_data[1:trainN, ]
 
-ts.train <- ts(train$Secchi_m, frequency = 7)
+ts.train <- ts(train$Secchi_m, frequency = 365)
 xreg_train <- as.matrix(train %>% select(Rain_lag23, AirTemp_C_mean))
 
 # ---- Step 7: Forecast future Secchi ----
